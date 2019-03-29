@@ -1,0 +1,55 @@
+version: '2'
+
+services:
+  couchbase:
+    image: "ratabayev/couchbase:1"
+    ports:
+    - "8091-8094:8091-8094"
+    - "11210:11210"
+    container_name: couchbase
+    networks:
+      - network1
+
+  kafka:
+    image: "spotify/kafka"
+    ports:
+    - "2181:2181"
+    - "9092:9092"
+    environment:
+    - ADVERTISED_HOST=localhost
+    - ADVERTISED_PORT=9092
+    container_name: kafka
+    networks:
+      - network1
+
+  postgres_bclient:
+    image: "postgres:latest"
+    ports:
+    - "5435:5432"
+    tmpfs:
+    - /var/lib/postgresql/data:rw
+    environment:
+    - POSTGRES_DB=<db_name>
+    - POSTGRES_USER=<db_user>
+    - POSTGRES_PASSWORD=<user_password>
+    container_name: postgres-<name>
+    networks:
+      - network1
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=<user_password>
+      - POSTGRES_USER=<user_name>
+      - POSTGRES_DB=<db_name>
+    ports:
+      - "5432:5432"
+    container_name: postgres
+    networks:
+      - network1
+
+networks:
+  network1:
+    driver: bridge
+    internal: true
